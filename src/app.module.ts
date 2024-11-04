@@ -14,6 +14,13 @@ import {Log} from "@entities/Log.entity";
 import {Product} from "@entities/Product.entity";
 import {Order} from "@entities/Order.entity";
 import {OrderedProduct} from "@entities/OrderedProduct.entity";
+import {LogService} from "@services/Log.service";
+import {OrderedProductRepository} from "@/repositories/orderedProduct.repository";
+import {ProductRepository} from "@/repositories/product.repository";
+import {OrderRepository} from "@/repositories/order.repository";
+import {CategoryRepository} from "@/repositories/category.repository";
+import {FeedbackRepository} from "@/repositories/feedback.repository";
+import {RoleRepository} from "@/repositories/role.repository";
 
 @Module({
     imports: [
@@ -25,7 +32,15 @@ import {OrderedProduct} from "@entities/OrderedProduct.entity";
         TypeOrmModule.forFeature([Role, Category, Feedback, User, Log, Product, Order, OrderedProduct]),
         ScheduleModule.forRoot(),
     ],
-    providers: [AppService, BackupService],
+    providers: [AppService,
+            BackupService,
+            LogService,
+            OrderedProductRepository,
+            ProductRepository,
+            OrderRepository,
+            CategoryRepository,
+            FeedbackRepository,
+            RoleRepository,],
     controllers: [AppController]
 })
 export class AppModule {}

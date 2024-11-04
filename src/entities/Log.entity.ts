@@ -12,6 +12,9 @@ export class Log {
     @Column("text")
     content: string
 
+    @Column({ length: 20 })
+    type: string;
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     date: Date
 

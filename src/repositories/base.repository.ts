@@ -1,13 +1,12 @@
-import { InjectRepository } from "@nestjs/typeorm";
 import {DeepPartial, FindOptionsWhere, Repository} from "typeorm";
 import { PaginationQueryDto } from "@/dtos/common.dto";
 import {LogService} from "@services/Log.service";
 
-// Создаем абстрактный класс с дженериком
-export abstract class BaseRepository<T extends { id: number }> {
+export abstract class BaseRepository<T extends Record<ID, number>, ID extends keyof T> {
     protected constructor(
         private readonly repository: Repository<T>,
-        private readonly logService: LogService
+        private readonly logService: LogService,
+        private readonly idField: ID
     ) {}
 
     async create(createDto: DeepPartial<T>, userId: number): Promise<T> {
@@ -45,7 +44,7 @@ export abstract class BaseRepository<T extends { id: number }> {
     }
 
     async findOne(id: number): Promise<T | null> {
-        return this.repository.findOneBy({ id } as FindOptionsWhere<T>);
+        return this.repository.findOneBy({ [this.idField]: id } as FindOptionsWhere<T>);
     }
 
     async findByCondition(condition: FindOptionsWhere<T>): Promise<T[]> {
@@ -59,12 +58,12 @@ export abstract class BaseRepository<T extends { id: number }> {
 
         try {
             const entity = await this.repository.preload({
-                id: id,
+                [this.idField]: id,
                 ...updateDto
             });
 
             if (!entity) {
-                throw new Error(`Entity with id ${id} not found`);
+                throw new Error(`Entity with ${String(this.idField)} ${id} not found`);
             }
 
             await queryRunner.manager.save(entity);
@@ -94,14 +93,14 @@ export abstract class BaseRepository<T extends { id: number }> {
         try {
             const entity = await this.findOne(id);
             if (!entity) {
-                throw new Error(`Entity with id ${id} not found`);
+                throw new Error(`Entity with ${String(this.idField)} ${id} not found`);
             }
 
             await queryRunner.manager.remove(entity);
 
             await this.logService.create({
                 userId,
-                content: `Deleted ${this.repository.metadata.name} with id ${id}`,
+                content: `Deleted ${this.repository.metadata.name} with ${String(this.idField)} ${id}`,
                 type: 'ENTITY_DELETE'
             });
 
@@ -113,5 +112,6 @@ export abstract class BaseRepository<T extends { id: number }> {
             await queryRunner.release();
         }
     }
+
 
 }
