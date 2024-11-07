@@ -8,7 +8,7 @@ export class Feedback {
     feedbackId: number
 
     @Column()
-    userId: number
+    userId: string
 
     @Column()
     productId: number

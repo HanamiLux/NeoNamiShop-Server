@@ -6,8 +6,8 @@ import {Role} from "@entities/Role.entity";
 
 @Entity("users")
 export class User {
-    @PrimaryGeneratedColumn()
-    userId: number
+    @PrimaryGeneratedColumn('uuid')
+    userId: string;
 
     @Column({ length: 40, unique: true })
     login: string

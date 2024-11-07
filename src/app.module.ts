@@ -21,6 +21,14 @@ import {OrderRepository} from "@/repositories/order.repository";
 import {CategoryRepository} from "@/repositories/category.repository";
 import {FeedbackRepository} from "@/repositories/feedback.repository";
 import {RoleRepository} from "@/repositories/role.repository";
+import {RoleController} from "@/controllers/role.controller";
+import {UserController} from "@/controllers/user.controller";
+import {UserRepository} from "@/repositories/user.repository";
+import {CategoryController} from "@/controllers/category.controller";
+import {FeedbackController} from "@/controllers/feedback.controller";
+import {LogController} from "@/controllers/log.controller";
+import {OrderController} from "@/controllers/order.controller";
+import {ProductController} from "@/controllers/product.controller";
 
 @Module({
     imports: [
@@ -40,7 +48,8 @@ import {RoleRepository} from "@/repositories/role.repository";
             OrderRepository,
             CategoryRepository,
             FeedbackRepository,
-            RoleRepository,],
-    controllers: [AppController]
+            RoleRepository,
+            UserRepository],
+    controllers: [AppController, RoleController, UserController, CategoryController, FeedbackController, LogController, OrderController, ProductController]
 })
 export class AppModule {}

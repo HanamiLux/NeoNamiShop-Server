@@ -7,7 +7,7 @@ export class Log {
     logId: number
 
     @Column()
-    userId: number
+    userId: string
 
     @Column("text")
     content: string

@@ -8,7 +8,7 @@ export class Order {
     orderId: number
 
     @Column()
-    userId: number
+    userId: string
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     date: Date

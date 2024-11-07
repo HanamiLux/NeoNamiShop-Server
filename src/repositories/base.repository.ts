@@ -2,14 +2,14 @@ import {DeepPartial, FindOptionsWhere, Repository} from "typeorm";
 import { PaginationQueryDto } from "@/dtos/common.dto";
 import {LogService} from "@services/Log.service";
 
-export abstract class BaseRepository<T extends Record<ID, number>, ID extends keyof T> {
+export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof T> {
     protected constructor(
         private readonly repository: Repository<T>,
         private readonly logService: LogService,
         private readonly idField: ID
     ) {}
 
-    async create(createDto: DeepPartial<T>, userId: number): Promise<T> {
+    async create(createDto: DeepPartial<T>, userId: string): Promise<T> {
         const queryRunner = this.repository.manager.connection.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -43,7 +43,7 @@ export abstract class BaseRepository<T extends Record<ID, number>, ID extends ke
         return { items, total };
     }
 
-    async findOne(id: number): Promise<T | null> {
+    async findOne(id: T[ID]): Promise<T | null> {
         return this.repository.findOneBy({ [this.idField]: id } as FindOptionsWhere<T>);
     }
 
@@ -51,7 +51,7 @@ export abstract class BaseRepository<T extends Record<ID, number>, ID extends ke
         return this.repository.findBy(condition);
     }
 
-    async update(id: number, updateDto: DeepPartial<T>, userId: number): Promise<T> {
+    async update(id: T[ID], updateDto: DeepPartial<T>, userId: string): Promise<T> {
         const queryRunner = this.repository.manager.connection.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -85,7 +85,7 @@ export abstract class BaseRepository<T extends Record<ID, number>, ID extends ke
     }
 
 
-    async remove(id: number, userId: number): Promise<void> {
+    async remove(id: T[ID], userId: string): Promise<void> {
         const queryRunner = this.repository.manager.connection.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
