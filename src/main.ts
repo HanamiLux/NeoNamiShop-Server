@@ -19,12 +19,12 @@ async function bootstrap() {
     // Swagger configuration
     const config = new DocumentBuilder()
         .setTitle('NEONAMI-API')
-        .setDescription('Endpoints')
+        .setDescription('Api documentation')
         .setVersion('1.0')
         // Add JWT bearer auth if you're using authentication
         // .addBearerAuth()
         // Add tags for API grouping if needed
-        .addTag('SHOP')
+        .addTag('products')
         .build();
 
     const document = SwaggerModule.createDocument(app, config);

@@ -1,8 +1,9 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne} from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, BeforeInsert, BeforeUpdate} from "typeorm"
 import { Order } from "./Order.entity"
 import { Feedback } from "./Feedback.entity"
 import { Log } from "./Log.entity"
 import {Role} from "@entities/Role.entity";
+import {PasswordUtils} from "@/utils/password.utils";
 
 @Entity("users")
 export class User {
@@ -32,4 +33,12 @@ export class User {
 
     @OneToMany(() => Log, log => log.user)
     logs: Log[]
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    async hashPassword() {
+        if (this.password) {
+            this.password = await PasswordUtils.hash(this.password);
+        }
+    }
 }
