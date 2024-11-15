@@ -1,34 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class AddViews1731684319246 implements MigrationInterface {
+export class AddProcFun1731684319246 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Создание представлений
-        await queryRunner.query(`
-            CREATE OR REPLACE VIEW product_feedback_statistics AS
-        SELECT
-            p."productName",
-            COUNT(f."feedbackId") AS total_feedbacks,
-            AVG(f.rate) AS average_rating,
-            STRING_AGG(f.content, ' | ' ORDER BY f.date DESC) AS recent_feedbacks
-        FROM products p
-        LEFT JOIN product_feedbacks pf ON p."productId" = pf."productProductId"
-        LEFT JOIN feedbacks f ON pf."feedbackFeedbackId" = f."feedbackId"
-        GROUP BY p."productName";
-
-        `);
-
-        await queryRunner.query(`
-            CREATE OR REPLACE VIEW product_statistics AS
-            SELECT
-                c."categoryName",
-                COUNT(p."productId") AS total_products,
-                AVG(p.price) AS average_price,
-                SUM(p.quantity) AS total_stock
-            FROM products p
-            JOIN category c ON p."categoryId" = c."categoryId"
-            GROUP BY c."categoryName";
-        `);
-
         // Создание функции
         await queryRunner.query(`
             CREATE OR REPLACE FUNCTION get_product_full_statistics(product_id INT)
@@ -88,10 +61,6 @@ export class AddViews1731684319246 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Удаление представлений
-        await queryRunner.query(`DROP VIEW IF EXISTS product_feedback_statistics;`);
-        await queryRunner.query(`DROP VIEW IF EXISTS product_statistics;`);
-
         // Удаление функции
         await queryRunner.query(`DROP FUNCTION IF EXISTS get_product_full_statistics(INT);`);
 
