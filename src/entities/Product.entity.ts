@@ -1,4 +1,4 @@
-import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {Category} from "@entities/Category.entity";
 import {OrderedProduct} from "@entities/OrderedProduct.entity";
 import {Feedback} from "@entities/Feedback.entity";
@@ -32,6 +32,6 @@ export class Product {
     @OneToMany(() => OrderedProduct, orderedProduct => orderedProduct.product)
     orderedProducts: OrderedProduct[]
 
-    @OneToMany(() => Feedback, feedback => feedback.product)
+    @ManyToMany(() => Feedback, feedback => feedback.products)
     feedbacks: Feedback[]
 }

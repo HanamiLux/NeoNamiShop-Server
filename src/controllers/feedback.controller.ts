@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query} from '@nestjs/common';
 import { FeedbackRepository } from '@/repositories/feedback.repository';
 import { PaginationQueryDto } from '@/dtos/common.dto';
 import { Feedback } from '@entities/Feedback.entity';
@@ -20,6 +20,14 @@ export class FeedbackController {
             throw new Error(`Feedback with ID ${id} not found`);
         }
         return feedback;
+    }
+
+    @Get('product/:productId')
+    async getFeedbacksByProduct(
+        @Param('productId', ParseIntPipe) productId: number,
+        @Query() paginationQuery: PaginationQueryDto
+    ): Promise<{ items: Feedback[], total: number }> {
+        return await this.feedbackRepository.findByProduct(productId, paginationQuery);
     }
 
     @Post()

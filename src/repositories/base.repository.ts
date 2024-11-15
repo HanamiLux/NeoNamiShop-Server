@@ -4,7 +4,7 @@ import {LogService} from "@services/Log.service";
 
 export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof T> {
     protected constructor(
-        private readonly repository: Repository<T>,
+        protected readonly repository: Repository<T>,
         private readonly logService: LogService,
         private readonly idField: ID
     ) {}

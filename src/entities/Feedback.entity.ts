@@ -1,30 +1,27 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "@entities/User.entity";
 import {Product} from "@entities/Product.entity";
 
 @Entity("feedbacks")
 export class Feedback {
     @PrimaryGeneratedColumn()
-    feedbackId: number
+    feedbackId: number;
 
     @Column()
-    userId: string
+    userId: string;
 
     @Column()
-    productId: number
-
-    @Column()
-    rate: number
+    rate: number;
 
     @Column("text")
-    content: string
+    content: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    date: Date
+    date: Date;
 
     @ManyToOne(() => User, user => user.feedbacks)
-    user: User
+    user: User;
 
-    @ManyToOne(() => Product, product => product.feedbacks)
-    product: Product
+    @ManyToMany(() => Product, product => product.feedbacks)
+    products: Product[];
 }
