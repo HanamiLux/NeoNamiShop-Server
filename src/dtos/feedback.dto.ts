@@ -19,7 +19,7 @@ export class CreateFeedbackDto {
 export class UpdateFeedbackDto extends PartialType(CreateFeedbackDto) {}
 
 export class FeedbackDto extends CreateFeedbackDto {
-    feedbackId: string;
+    feedbackId: number;
     date: Date;
     userId: string;
 }

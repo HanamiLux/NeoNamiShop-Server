@@ -35,7 +35,7 @@ export class CreateLogDto {
 export class UpdateLogDto extends PartialType(CreateLogDto) {}
 
 export class LogDto extends CreateLogDto {
-    logId: string;
+    logId: number;
     date: Date;
     userId: string;
 }

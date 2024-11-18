@@ -20,7 +20,7 @@ export class CreateOrderDto {
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
 
 export class OrderDto extends CreateOrderDto {
-    orderId: string;
+    orderId: number;
     date: Date;
     userId: string;
 }
