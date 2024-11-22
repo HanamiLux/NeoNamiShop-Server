@@ -15,7 +15,7 @@ export class CategoryController {
 
     @Get(':id')
     async getCategory(@Param('id', ParseIntPipe) id: number): Promise<Category> {
-        const category = await this.categoryRepository.findOne(id);
+        const category = await this.categoryRepository.findOneById(id);
         if (!category) {
             throw new Error(`Category with ID ${id} not found`);
         }

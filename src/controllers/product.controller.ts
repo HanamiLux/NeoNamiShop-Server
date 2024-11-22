@@ -29,7 +29,7 @@ export class ProductController {
     @ApiResponse({ status: 200, type: [Product] })
     @Get(':id')
     async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-        const product = await this.productRepository.findOne(id);
+        const product = await this.productRepository.findOneById(id);
         if (!product) {
             throw new Error(`Product with ID ${id} not found`);
         }

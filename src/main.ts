@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import {BadRequestException, ValidationPipe} from '@nestjs/common';
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {DataSource} from "typeorm";
 
@@ -10,8 +10,22 @@ async function bootstrap() {
     console.log('База данных подключена:', dataSource.isInitialized);
     console.log('Список сущностей:', dataSource.entityMetadatas.map(entity => entity.name));
     app.useGlobalPipes(new ValidationPipe({
-        whitelist: true,
-        transform: true,
+        transform: true, // Преобразует входные данные в соответствующие типы
+        whitelist: true, // Удаляет невалидные поля
+        forbidNonWhitelisted: true, // Запрещает невалидные поля
+        exceptionFactory: (errors) => {
+            const messages = errors.map(error => {
+                return {
+                    field: error.property,
+                    errors: Object.values(error.constraints),
+                };
+            });
+            return new BadRequestException({
+                statusCode: 400,
+                message: 'Validation failed',
+                errors: messages,
+            });
+        },
     }));
 
     app.enableCors();

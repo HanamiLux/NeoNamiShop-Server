@@ -15,7 +15,7 @@ export class FeedbackController {
 
     @Get(':id')
     async getFeedback(@Param('id', ParseUUIDPipe) id: number): Promise<Feedback> {
-        const feedback = await this.feedbackRepository.findOne(id);
+        const feedback = await this.feedbackRepository.findOneById(id);
         if (!feedback) {
             throw new Error(`Feedback with ID ${id} not found`);
         }

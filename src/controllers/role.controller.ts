@@ -16,7 +16,7 @@ export class RoleController {
 
     @Get(":id")
     async getRole(@Param("id", ParseIntPipe) id: number): Promise<Role> {
-        const role = await this.roleRepository.findOne(id);
+        const role = await this.roleRepository.findOneById(id);
         if (!role) {
             throw new Error(`Role with ID ${id} not found`);
         }

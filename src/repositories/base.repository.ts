@@ -9,7 +9,7 @@ export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof
         private readonly idField: ID
     ) {}
 
-    async create(createDto: DeepPartial<T>, userId: string): Promise<T> {
+    async create(createDto: DeepPartial<T>, userId?: string): Promise<T> {
         const queryRunner = this.repository.manager.connection.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -18,11 +18,14 @@ export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof
             const entity = this.repository.create(createDto);
             await queryRunner.manager.save(entity);
 
-            await this.logService.create({
-                userId,
-                content: `Created ${this.repository.metadata.name} ${JSON.stringify(entity)}`,
-                type: 'ENTITY_CREATE'
-            });
+            // Логируем изменения, только если userId передан
+            if (userId) {
+                await this.logService.create({
+                    userId,
+                    content: `Created ${this.repository.metadata.name} ${JSON.stringify(entity)}`,
+                    type: 'ENTITY_CREATE',
+                });
+            }
 
             await queryRunner.commitTransaction();
             return entity;
@@ -34,6 +37,7 @@ export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof
         }
     }
 
+
     async findAll(query: PaginationQueryDto): Promise<{ items: T[], total: number }> {
         const [items, total] = await this.repository.findAndCount({
             skip: query.skip,
@@ -43,13 +47,19 @@ export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof
         return { items, total };
     }
 
-    async findOne(id: T[ID]): Promise<T | null> {
+    async findOneById(id: T[ID]): Promise<T | null> {
         return this.repository.findOneBy({ [this.idField]: id } as FindOptionsWhere<T>);
     }
+
+    async findOne(condition: FindOptionsWhere<T>): Promise<T | null> {
+        return this.repository.findOne({ where: condition });
+    }
+
 
     async findByCondition(condition: FindOptionsWhere<T>): Promise<T[]> {
         return this.repository.findBy(condition);
     }
+
 
     async update(id: T[ID], updateDto: DeepPartial<T>, userId: string): Promise<T> {
         const queryRunner = this.repository.manager.connection.createQueryRunner();
@@ -91,7 +101,7 @@ export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof
         await queryRunner.startTransaction();
 
         try {
-            const entity = await this.findOne(id);
+            const entity = await this.findOneById(id);
             if (!entity) {
                 throw new Error(`Entity with ${String(this.idField)} ${id} not found`);
             }

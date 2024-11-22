@@ -15,7 +15,7 @@ export class OrderController {
 
     @Get(':id')
     async getOrder(@Param('id', ParseUUIDPipe) id: number): Promise<Order> {
-        const order = await this.orderRepository.findOne(id);
+        const order = await this.orderRepository.findOneById(id);
         if (!order) {
             throw new Error(`Order with ID ${id} not found`);
         }

@@ -17,15 +17,19 @@ export class CreateUserDto {
     @Length(6, 255)
     password: string;
 
-    @IsString()
-    @IsNotEmpty()
-    roleId: number;
 }
 
 // DTO для обновления на основе CreateUserDto
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
 // DTO для ответа
-export class UserDto extends CreateUserDto {
-    userId: number;
+export class UserDto extends PartialType(CreateUserDto) {
+    userId: string;
+}
+
+export class LoginDto {
+    @IsEmail()
+    email: string;
+    @IsString()
+    password: string;
 }
