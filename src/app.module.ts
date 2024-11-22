@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
-import { config } from '@/config/ormconfig';
-import { BackupService } from "@services/Backup.service";
-import { AppController } from "@/controllers/app.controller";
-import { AppService } from "@services/app.service";
+import {Module} from '@nestjs/common';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {ConfigModule} from '@nestjs/config';
+import {ScheduleModule} from '@nestjs/schedule';
+import {config} from '@/config/ormconfig';
+import {BackupService} from "@services/Backup.service";
+import {AppController} from "@/controllers/app.controller";
+import {AppService} from "@services/app.service";
 import {Role} from "@entities/Role.entity";
 import {Category} from "@entities/Category.entity";
 import {Feedback} from "@entities/Feedback.entity";
@@ -29,6 +29,9 @@ import {FeedbackController} from "@/controllers/feedback.controller";
 import {LogController} from "@/controllers/log.controller";
 import {OrderController} from "@/controllers/order.controller";
 import {ProductController} from "@/controllers/product.controller";
+import {Repository} from "typeorm";
+import {ProductFeedbackStatistics} from "@entities/productFeedbackStatistics.entity";
+import {ProductStatistics} from "@entities/productStatistics.entity";
 
 @Module({
     imports: [
@@ -37,19 +40,33 @@ import {ProductController} from "@/controllers/product.controller";
             envFilePath: '.env'
         }),
         TypeOrmModule.forRootAsync(config),
-        TypeOrmModule.forFeature([Role, Category, Feedback, User, Log, Product, Order, OrderedProduct]),
+        TypeOrmModule.forFeature([Role, Category, Feedback, User, Log, Product, Order, OrderedProduct, ProductFeedbackStatistics, ProductStatistics]),
         ScheduleModule.forRoot(),
     ],
     providers: [AppService,
-            BackupService,
-            LogService,
-            OrderedProductRepository,
-            ProductRepository,
-            OrderRepository,
-            CategoryRepository,
-            FeedbackRepository,
-            RoleRepository,
-            UserRepository],
-    controllers: [AppController, RoleController, UserController, CategoryController, FeedbackController, LogController, OrderController, ProductController]
+        BackupService,
+        LogService,
+        OrderedProductRepository,
+        ProductRepository,
+        OrderRepository,
+        CategoryRepository,
+        FeedbackRepository,
+        RoleRepository,
+        UserRepository,
+        Repository<ProductFeedbackStatistics>,
+        Repository<ProductStatistics>
+
+    ],
+    controllers: [AppController,
+        RoleController,
+        UserController,
+        CategoryController,
+        FeedbackController,
+        LogController,
+        OrderController,
+        ProductController,
+
+    ]
 })
-export class AppModule {}
+export class AppModule {
+}
