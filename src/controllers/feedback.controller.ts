@@ -30,6 +30,14 @@ export class FeedbackController {
         return await this.feedbackRepository.findByProduct(productId, paginationQuery);
     }
 
+    @Get('user/:userId')
+    async getFeedbacksByUser(
+        @Param('userId', ParseUUIDPipe) userId: string,
+        @Query() paginationQuery: PaginationQueryDto
+    ): Promise<{ items: Feedback[], total: number }> {
+        return await this.feedbackRepository.findByUser(userId, paginationQuery);
+    }
+
     @Post()
     async createFeedback(
         @Body() createFeedbackDto: CreateFeedbackDto,

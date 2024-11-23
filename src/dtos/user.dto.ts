@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, Length, IsEmail } from 'class-validator';
-import { PartialType } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, Length, IsEmail, IsOptional } from 'class-validator';
+import { PartialType, OmitType } from '@nestjs/swagger';
 
 // Базовый DTO для создания
 export class CreateUserDto {
@@ -16,11 +16,28 @@ export class CreateUserDto {
     @IsNotEmpty()
     @Length(6, 255)
     password: string;
-
 }
 
-// DTO для обновления на основе CreateUserDto
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+// Комбинированный DTO для обновления
+export class UpdateUserDto {
+    @IsOptional()
+    @IsString()
+    @Length(2, 50)
+    login?: string;
+
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    currentPassword?: string;
+
+    @IsOptional()
+    @IsString()
+    @Length(6, 255)
+    newPassword?: string;
+}
 
 // DTO для ответа
 export class UserDto extends PartialType(CreateUserDto) {
@@ -30,6 +47,7 @@ export class UserDto extends PartialType(CreateUserDto) {
 export class LoginDto {
     @IsEmail()
     email: string;
+
     @IsString()
     password: string;
 }

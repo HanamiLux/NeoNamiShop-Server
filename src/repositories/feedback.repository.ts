@@ -24,4 +24,20 @@ export class FeedbackRepository extends BaseRepository<Feedback, 'feedbackId'> {
 
         return { items, total };
     }
+
+    async findByUser(userId: string, paginationQuery: PaginationQueryDto): Promise<{ items: Feedback[], total: number }> {
+        const query = this.repository.createQueryBuilder('feedback')
+            .leftJoinAndSelect('feedback.user', 'user')
+            .where('user.userId = :userId', { userId })
+            .skip(paginationQuery.skip)
+            .take(paginationQuery.take);
+
+        const items = await query.getMany();
+        const total = await query.getCount();
+
+        return { items, total };
+    }
+
+
+
 }
