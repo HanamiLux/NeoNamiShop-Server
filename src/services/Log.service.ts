@@ -19,6 +19,7 @@ export class LogService {
 
     async findAll(query: PaginationQueryDto): Promise<{ items: Log[], total: number }> {
         const [items, total] = await this.logRepository.findAndCount({
+            order: { date: 'DESC' },
             skip: query.skip,
             take: query.take,
         });

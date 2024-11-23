@@ -4,6 +4,7 @@ import { BaseRepository } from '@/repositories/base.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LogService } from '@services/Log.service';
+import {PaginationQueryDto} from "@/dtos/common.dto";
 
 @Injectable()
 export class ProductRepository extends BaseRepository<Product, 'productId'> {
@@ -13,5 +14,19 @@ export class ProductRepository extends BaseRepository<Product, 'productId'> {
         logService: LogService,
     ) {
         super(repository, logService, 'productId');
+    }
+
+    override async findAll(query: PaginationQueryDto): Promise<{ items: Product[], total: number }> {
+        try {
+            const [items, total] = await this.repository.findAndCount({
+                skip: query.skip,
+                take: query.take,
+                // relations: ['feedbacks', 'category'],
+            });
+            return { items, total };
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to fetch products');
+        }
     }
 }

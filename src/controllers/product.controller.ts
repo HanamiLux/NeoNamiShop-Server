@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post,
 import { ProductRepository } from '@/repositories/product.repository';
 import { PaginationQueryDto } from '@/dtos/common.dto';
 import { Product } from '@entities/Product.entity';
-import { CreateProductDto, UpdateProductDto } from '@/dtos/product.dto';
+import {CreateProductDto, ProductDto, toProductDto, UpdateProductDto} from '@/dtos/product.dto';
 import {ProductFeedbackStatistics} from "@entities/productFeedbackStatistics.entity";
 import {Repository} from "typeorm";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -19,31 +19,36 @@ export class ProductController {
                 private productStatisticsRepository: Repository<ProductStatistics>) {}
 
     @ApiOperation({ summary: 'Get a list of products' })
-    @ApiResponse({ status: 200, type: [Product] })
+    @ApiResponse({ status: 200, type: [ProductDto] })
     @Get()
-    async getProducts(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: Product[], total: number }> {
-        return await this.productRepository.findAll(paginationQuery);
+    async getProducts(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: ProductDto[], total: number } | { message: string }> {
+        const { items, total } = await this.productRepository.findAll(paginationQuery);
+        if (!items || items.length === 0) {
+            return { message: 'Нет товаров' };
+        }
+        const productDtos = items.map(toProductDto);
+        return { items: productDtos, total };
     }
 
     @ApiOperation({ summary: 'Get a product' })
-    @ApiResponse({ status: 200, type: [Product] })
+    @ApiResponse({ status: 200, type: ProductDto })
     @Get(':id')
-    async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+    async getProduct(@Param('id', ParseIntPipe) id: number): Promise<ProductDto> {
         const product = await this.productRepository.findOneById(id);
         if (!product) {
             throw new Error(`Product with ID ${id} not found`);
         }
-        return product;
+        return toProductDto(product);
     }
 
     @ApiOperation({ summary: 'Create a product' })
-    @ApiResponse({ status: 200, type: [Product] })
     @Post()
     async createProduct(
         @Body() createProductDto: CreateProductDto,
         @Query('userId', ParseUUIDPipe) userId: string
-    ): Promise<Product> {
-        return await this.productRepository.create(createProductDto, userId);
+    ): Promise<ProductDto> {
+        const product = await this.productRepository.create(createProductDto, userId);
+        return toProductDto(product);
     }
 
     @ApiOperation({ summary: 'Update a product' })

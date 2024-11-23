@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query} from "@nestjs/common";
 import {RoleRepository} from "@/repositories/role.repository";
 import {PaginationQueryDto} from "@/dtos/common.dto";
 import {Role} from "@entities/Role.entity";
@@ -26,7 +26,7 @@ export class RoleController {
     @Post()
     async createRole(
         @Body() createRoleDto: CreateRoleDto,
-        @Query("userId", ParseIntPipe) userId: string
+        @Query("userId", ParseUUIDPipe) userId: string
     ): Promise<Role> {
         return await this.roleRepository.create(createRoleDto, userId);
     }
@@ -35,7 +35,7 @@ export class RoleController {
     async updateRole(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateRoleDto: UpdateRoleDto,
-        @Query("userId", ParseIntPipe) userId: string
+        @Query("userId", ParseUUIDPipe) userId: string
     ): Promise<Role> {
         return await this.roleRepository.update(id, updateRoleDto, userId);
     }
@@ -43,7 +43,7 @@ export class RoleController {
     @Delete(":id")
     async deleteRole(
         @Param("id", ParseIntPipe) id: number,
-        @Query("userId", ParseIntPipe) userId: string
+        @Query("userId", ParseUUIDPipe) userId: string
     ): Promise<void> {
         await this.roleRepository.remove(id, userId);
     }

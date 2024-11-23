@@ -24,7 +24,7 @@ export class Product {
     quantity: number
 
     @Column("text", { array: true })
-    imagesUrl: string[]
+    imagesUrl?: string[]
 
     @ManyToOne(() => Category)
     category: Category
