@@ -1,4 +1,13 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, BeforeInsert, BeforeUpdate} from "typeorm"
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToMany,
+    ManyToOne,
+    BeforeInsert,
+    BeforeUpdate,
+    JoinColumn
+} from "typeorm"
 import { Order } from "./Order.entity"
 import { Feedback } from "./Feedback.entity"
 import { Log } from "./Log.entity"
@@ -23,6 +32,7 @@ export class User {
     roleId: number
 
     @ManyToOne(() => Role, role => role.users)
+    @JoinColumn({ name: 'roleId' })
     role: Role
 
     @OneToMany(() => Order, order => order.user)
@@ -40,5 +50,9 @@ export class User {
         if (this.password) {
             this.password = await PasswordUtils.hash(this.password);
         }
+    }
+
+    getRoleName(): string | undefined {
+        return this.role.roleName;
     }
 }

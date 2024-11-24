@@ -1,11 +1,11 @@
-import {DeepPartial, FindOptionsWhere, Repository} from "typeorm";
+import {DeepPartial, FindOneOptions, FindOptions, FindOptionsWhere, Repository} from "typeorm";
 import { PaginationQueryDto } from "@/dtos/common.dto";
 import {LogService} from "@services/Log.service";
 
 export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof T> {
     protected constructor(
         protected readonly repository: Repository<T>,
-        private readonly logService: LogService,
+        protected readonly logService: LogService,
         private readonly idField: ID
     ) {}
 
@@ -47,8 +47,11 @@ export abstract class BaseRepository<T extends Record<ID, any>, ID extends keyof
         return { items, total };
     }
 
-    async findOneById(id: T[ID]): Promise<T | null> {
-        return this.repository.findOneBy({ [this.idField]: id } as FindOptionsWhere<T>);
+    async findOneById(id: T[ID], options?: FindOneOptions<T>): Promise<T | null> {
+        return this.repository.findOne({
+            where: { [this.idField]: id } as FindOptionsWhere<T>,
+            ...options
+        });
     }
 
     async findOne(condition: FindOptionsWhere<T>): Promise<T | null> {

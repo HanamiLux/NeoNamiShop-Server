@@ -7,28 +7,30 @@ import { Role } from "@entities/Role.entity";
 import { LogService } from "@services/Log.service";
 import { PasswordUtils } from "@/utils/password.utils";
 import { UpdateUserDto } from "@/dtos/user.dto";
+import {PaginationQueryDto} from "@/dtos/common.dto";
+import {RoleRepository} from "@/repositories/role.repository";
 
 @Injectable()
 export class UserRepository extends BaseRepository<User, 'userId'> {
     constructor(
         @InjectRepository(User) repository: Repository<User>,
-        @InjectRepository(Role) private roleRepository: Repository<Role>,
+        @InjectRepository(Role) private roleRepository: RoleRepository,
         logService: LogService
     ) {
         super(repository, logService, 'userId');
     }
 
-    private async getDefaultRole(): Promise<Role> {
-        const defaultRole = await this.roleRepository.findOne({
-            where: { roleName: 'user' }
+    override async findAll(query: PaginationQueryDto): Promise<{ items: User[], total: number }> {
+        const [items, total] = await this.repository.findAndCount({
+            skip: query.skip,
+            take: query.take,
+            relations: ["role", "feedbacks", "orders"]
         });
 
-        if (!defaultRole) {
-            throw new Error('Default role not found');
-        }
-
-        return defaultRole;
+        return { items, total };
     }
+
+
 
     async findByEmail(email: string): Promise<User | null> {
         return await this.repository.findOne({
@@ -38,12 +40,14 @@ export class UserRepository extends BaseRepository<User, 'userId'> {
     }
 
     override async create(createDto: Partial<User>): Promise<User> {
-        const defaultRole = await this.getDefaultRole();
+        const defaultRole = await this.roleRepository.getDefaultRole();
 
-        return super.create({
+        const user = this.repository.create({
             ...createDto,
             roleId: defaultRole.roleId
         });
+
+        return await this.repository.save(user);
     }
 
     async update(id: string, updateDto: UpdateUserDto, userId: string): Promise<User> {
@@ -52,6 +56,10 @@ export class UserRepository extends BaseRepository<User, 'userId'> {
             login: updateDto.login,
             email: updateDto.email
         };
+
+        if(updateDto.roleId){
+            updateData.roleId = updateDto.roleId;
+        }
 
         // Если пытаемся обновить пароль
         if (updateDto.newPassword) {

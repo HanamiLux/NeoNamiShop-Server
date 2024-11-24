@@ -44,11 +44,13 @@ export class UserController {
                 return { message: 'Неправильный логин или пароль' };
             }
 
+            const userWithRole = await this.userRepository.findOneById(user.userId, { relations: ['role'] });
             return {
                 user: {
                     userId: user.userId,
                     email: user.email,
                     login: user.login,
+                    roleName: userWithRole.getRoleName()
                 }
             };
         } catch (error) {
@@ -58,21 +60,35 @@ export class UserController {
     }
 
     @Get()
-    async getUsers(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: User[], total: number }> {
-        return await this.userRepository.findAll(paginationQuery);
+    async getUsers(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: UserDto[], total: number }> {
+        const { items, total } = await this.userRepository.findAll(paginationQuery);
+        const usersWithRoleNames = await Promise.all(items.map(async (user) => {
+            const role = user.getRoleName();
+            return {
+                ...user,
+                roleName: role
+            };
+        }));
+        return { items: usersWithRoleNames, total };
     }
 
     @Get(':id')
-    async getUser(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
-        const user = await this.userRepository.findOneById(id);
+    async getUser(@Param('id', ParseUUIDPipe) id: string): Promise<UserDto> {
+        const user = await this.userRepository.findOneById(id, { relations: ['role'] });
         if (!user) {
             throw new Error(`User with ID ${id} not found`);
         }
-        return user;
+
+        return {
+            userId: user.userId,
+            email: user.email,
+            login: user.login,
+            roleName: user.getRoleName()
+        };
     }
 
     @Post()
-    async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    async createUser(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
         try {
             console.log(createUserDto);  // Логируем данные, полученные от клиента
 
@@ -82,7 +98,17 @@ export class UserController {
                 throw new BadRequestException('Пользователь с таким email уже существует');
             }
 
-            return await this.userRepository.create(createUserDto);
+            const user = await this.userRepository.create(createUserDto);
+
+            // Загружаем роль для пользователя
+            const userWithRole = await this.userRepository.findOneById(user.userId, { relations: ['role'] });
+
+            return {
+                userId: userWithRole.userId,
+                email: userWithRole.email,
+                login: userWithRole.login,
+                roleName: userWithRole.getRoleName()
+            };
         } catch (err) {
             console.error('Ошибка при создании пользователя:', err);
             throw new BadRequestException(err);
@@ -94,8 +120,16 @@ export class UserController {
         @Param('id', ParseUUIDPipe) id: string,
         @Body() updateUserDto: UpdateUserDto,
         @Query('userId', ParseUUIDPipe) userId: string
-    ): Promise<User> {
-        return await this.userRepository.update(id, updateUserDto, userId);
+    ): Promise<UserDto> {
+        const user = await this.userRepository.update(id, updateUserDto, userId);
+        const userWithRole = await this.userRepository.findOneById(user.userId, { relations: ['role'] });
+
+        return {
+            userId: userWithRole.userId,
+            email: userWithRole.email,
+            login: userWithRole.login,
+            roleName: userWithRole.getRoleName()
+        };
     }
 
     @Delete(':id')
