@@ -23,9 +23,6 @@ export class ProductController {
     @Get()
     async getProducts(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: ProductDto[], total: number } | { message: string }> {
         const { items, total } = await this.productRepository.findAll(paginationQuery);
-        if (!items || items.length === 0) {
-            return { message: 'Нет товаров' };
-        }
         const productDtos = items.map(toProductDto);
         return { items: productDtos, total };
     }
