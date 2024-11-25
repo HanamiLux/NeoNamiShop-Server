@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Order } from '@entities/Order.entity';
-import { BaseRepository } from '@/repositories/base.repository';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { LogService } from '@services/Log.service';
+import {Injectable} from '@nestjs/common';
+import {Order} from '@entities/Order.entity';
+import {BaseRepository} from '@/repositories/base.repository';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {LogService} from '@services/Log.service';
 import {OrderResponseDto} from "@/dtos/orderedProduct.dto";
 import {Product} from "@entities/Product.entity";
 import {OrderedProduct} from "@entities/OrderedProduct.entity";
@@ -65,10 +65,10 @@ export class OrderRepository extends BaseRepository<Order, 'orderId'> {
             await queryRunner.manager.save(order);
 
             // Создаем orderedProducts для каждого продукта
-            const orderedProducts = await Promise.all(
+            order.orderedProducts = await Promise.all(
                 createOrderDto.products.map(async (productData) => {
                     const product = await queryRunner.manager.findOne(Product, {
-                        where: { productId: productData.productId }
+                        where: {productId: productData.productId}
                     });
 
                     if (!product) {
@@ -87,8 +87,6 @@ export class OrderRepository extends BaseRepository<Order, 'orderId'> {
                     return queryRunner.manager.save(orderedProduct);
                 })
             );
-
-            order.orderedProducts = orderedProducts;
 
             await this.logService.create({
                 userId,

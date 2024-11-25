@@ -1,4 +1,16 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, ParseUUIDPipe, Post, Put, Query} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    ParseUUIDPipe,
+    Post,
+    Put,
+    Query
+} from '@nestjs/common';
 import { PaginationQueryDto } from '@/dtos/common.dto';
 import { Order } from '@entities/Order.entity';
 import { CreateOrderDto, UpdateOrderDto } from '@/dtos/order.dto';
@@ -19,7 +31,7 @@ export class OrderController {
 
     @Get(':id')
     async getOrder(
-        @Param('id', ParseUUIDPipe) id: number
+        @Param('id', ParseIntPipe) id: number
     ): Promise<OrderResponseDto> {
         const order = await this.orderService.findOneWithProducts(id);
         if (!order) {
@@ -39,8 +51,8 @@ export class OrderController {
 
     @Put(':id')
     async updateOrder(
-        @Param('id', ParseUUIDPipe) id: number,
-        @Body() updateOrderDto: UpdateOrderDto,
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateOrderDto: Partial<UpdateOrderDto>,
         @Query('userId', ParseUUIDPipe) userId: string
     ): Promise<Order> {
         return await this.orderService.update(id, updateOrderDto, userId);
@@ -48,7 +60,7 @@ export class OrderController {
 
     @Delete(':id')
     async deleteOrder(
-        @Param('id', ParseUUIDPipe) id: number,
+        @Param('id', ParseIntPipe) id: number,
         @Query('userId', ParseUUIDPipe) userId: string
     ): Promise<void> {
         await this.orderService.remove(id, userId);
