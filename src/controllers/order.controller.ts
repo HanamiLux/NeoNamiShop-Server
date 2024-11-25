@@ -1,23 +1,29 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
-import { OrderRepository } from '@/repositories/order.repository';
+import {Body, Controller, Delete, Get, NotFoundException, Param, ParseUUIDPipe, Post, Put, Query} from '@nestjs/common';
 import { PaginationQueryDto } from '@/dtos/common.dto';
 import { Order } from '@entities/Order.entity';
 import { CreateOrderDto, UpdateOrderDto } from '@/dtos/order.dto';
+import {OrderRepository} from "@/repositories/order.repository";
+import {OrderResponseDto} from "@/dtos/orderedProduct.dto";
+
 
 @Controller('orders')
 export class OrderController {
-    constructor(private readonly orderRepository: OrderRepository) {}
+    constructor(private readonly orderService: OrderRepository) {}
 
     @Get()
-    async getOrders(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: Order[], total: number }> {
-        return await this.orderRepository.findAll(paginationQuery);
+    async getOrders(
+        @Query() paginationQuery: PaginationQueryDto
+    ): Promise<{ items: OrderResponseDto[], total: number }> {
+        return await this.orderService.findAllWithProducts(paginationQuery);
     }
 
     @Get(':id')
-    async getOrder(@Param('id', ParseUUIDPipe) id: number): Promise<Order> {
-        const order = await this.orderRepository.findOneById(id);
+    async getOrder(
+        @Param('id', ParseUUIDPipe) id: number
+    ): Promise<OrderResponseDto> {
+        const order = await this.orderService.findOneWithProducts(id);
         if (!order) {
-            throw new Error(`Order with ID ${id} not found`);
+            throw new NotFoundException(`Order with ID ${id} not found`);
         }
         return order;
     }
@@ -26,8 +32,9 @@ export class OrderController {
     async createOrder(
         @Body() createOrderDto: CreateOrderDto,
         @Query('userId', ParseUUIDPipe) userId: string
-    ): Promise<Order> {
-        return await this.orderRepository.create(createOrderDto, userId);
+    ): Promise<OrderResponseDto> {
+        const order = await this.orderService.createOrder(createOrderDto, userId);
+        return this.orderService.findOneWithProducts(order.orderId);
     }
 
     @Put(':id')
@@ -36,7 +43,7 @@ export class OrderController {
         @Body() updateOrderDto: UpdateOrderDto,
         @Query('userId', ParseUUIDPipe) userId: string
     ): Promise<Order> {
-        return await this.orderRepository.update(id, updateOrderDto, userId);
+        return await this.orderService.update(id, updateOrderDto, userId);
     }
 
     @Delete(':id')
@@ -44,6 +51,6 @@ export class OrderController {
         @Param('id', ParseUUIDPipe) id: number,
         @Query('userId', ParseUUIDPipe) userId: string
     ): Promise<void> {
-        await this.orderRepository.remove(id, userId);
+        await this.orderService.remove(id, userId);
     }
 }

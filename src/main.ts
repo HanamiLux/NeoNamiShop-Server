@@ -3,12 +3,20 @@ import { AppModule } from './app.module';
 import {BadRequestException, ValidationPipe} from '@nestjs/common';
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {DataSource} from "typeorm";
+import { join } from 'path';
+import {NestExpressApplication} from "@nestjs/platform-express";
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const dataSource = app.get(DataSource);
     console.log('База данных подключена:', dataSource.isInitialized);
     console.log('Список сущностей:', dataSource.entityMetadatas.map(entity => entity.name));
+
+    // Настраиваем раздачу статических файлов
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+        prefix: '/uploads/',
+    });
+
     app.useGlobalPipes(new ValidationPipe({
         transform: true, // Преобразует входные данные в соответствующие типы
         whitelist: true, // Удаляет невалидные поля

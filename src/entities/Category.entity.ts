@@ -12,6 +12,8 @@ export class Category {
     @Column("text")
     description: string
 
-    @OneToMany(() => Product, product => product.category)
+    @OneToMany(() => Product, product => product.category, {
+        nullable: true // Разрешаем null для связи
+    })
     products: Product[]
 }

@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Product } from '@entities/Product.entity';
 import { BaseRepository } from '@/repositories/base.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {DeepPartial, Repository} from 'typeorm';
 import { LogService } from '@services/Log.service';
 import {PaginationQueryDto} from "@/dtos/common.dto";
+import * as process from "node:process";
 
 @Injectable()
 export class ProductRepository extends BaseRepository<Product, 'productId'> {
@@ -21,7 +22,7 @@ export class ProductRepository extends BaseRepository<Product, 'productId'> {
             const [items, total] = await this.repository.findAndCount({
                 skip: query.skip,
                 take: query.take,
-                // relations: ['feedbacks', 'category'],
+                relations: ['category', 'orderedProducts', 'feedbacks'],
             });
             return { items, total };
         } catch (error) {
@@ -29,4 +30,5 @@ export class ProductRepository extends BaseRepository<Product, 'productId'> {
             throw new Error('Failed to fetch products');
         }
     }
+
 }

@@ -1,4 +1,4 @@
-import { IsInt, IsOptional } from "class-validator";
+import {IsBoolean, IsInt, IsOptional, IsString} from "class-validator";
 import { Type } from "class-transformer";
 
 export class PaginationQueryDto {
@@ -11,6 +11,14 @@ export class PaginationQueryDto {
     @IsInt()
     @Type(() => Number)
     take?: number;
+
+    @IsOptional()
+    @IsString()
+    sort?: string;
+
+    @IsOptional()
+    @IsString()
+    order?: 'ASC' | 'DESC';
 
     constructor() {
         this.page = this.page || 1;

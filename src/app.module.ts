@@ -32,6 +32,7 @@ import {ProductController} from "@/controllers/product.controller";
 import {Repository} from "typeorm";
 import {ProductFeedbackStatistics} from "@entities/productFeedbackStatistics.entity";
 import {ProductStatistics} from "@entities/productStatistics.entity";
+import {MulterModule} from "@nestjs/platform-express";
 
 @Module({
     imports: [
@@ -41,6 +42,9 @@ import {ProductStatistics} from "@entities/productStatistics.entity";
         }),
         TypeOrmModule.forRootAsync(config),
         TypeOrmModule.forFeature([Role, Category, Feedback, User, Log, Product, Order, OrderedProduct, ProductFeedbackStatistics, ProductStatistics]),
+        MulterModule.register({
+            dest: './uploads',
+        }),
         ScheduleModule.forRoot(),
     ],
     providers: [AppService,
