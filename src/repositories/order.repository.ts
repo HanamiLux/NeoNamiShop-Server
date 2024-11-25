@@ -20,7 +20,19 @@ export class OrderRepository extends BaseRepository<Order, 'orderId'> {
         super(repository, logService, 'orderId');
     }
 
-    // Новые методы для работы с DTO
+    async findAllWithProductsByUser(userId: string, paginationQuery: PaginationQueryDto): Promise<{ items: OrderResponseDto[], total: number }> {
+        const [items, total] = await this.repository.createQueryBuilder('order')
+            .leftJoinAndSelect('order.orderedProducts', 'orderedProduct')
+            .where('order.userId = :userId', { userId })
+            .take(paginationQuery.take || 10)
+            .skip(paginationQuery.skip || 0)
+            .getManyAndCount();
+
+        return { items: items.map(order => this.mapOrderToDto(order)), total };
+    }
+
+
+
     async findAllWithProducts(query: PaginationQueryDto): Promise<{ items: OrderResponseDto[], total: number }> {
         const [orders, total] = await this.repository.createQueryBuilder('order')
             .leftJoinAndSelect('order.orderedProducts', 'orderedProducts')

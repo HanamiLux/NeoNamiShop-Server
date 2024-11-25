@@ -29,6 +29,14 @@ export class OrderController {
         return await this.orderService.findAllWithProducts(paginationQuery);
     }
 
+    @Get('user/:userId')
+    async getOrdersByUser(
+        @Param('userId', ParseUUIDPipe) userId: string,
+        @Query() paginationQuery: PaginationQueryDto
+    ): Promise<{ items: OrderResponseDto[], total: number }> {
+        return await this.orderService.findAllWithProductsByUser(userId, paginationQuery);
+    }
+
     @Get(':id')
     async getOrder(
         @Param('id', ParseIntPipe) id: number
