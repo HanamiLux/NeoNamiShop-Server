@@ -33,6 +33,7 @@ import {Repository} from "typeorm";
 import {ProductFeedbackStatistics} from "@entities/productFeedbackStatistics.entity";
 import {ProductStatistics} from "@entities/productStatistics.entity";
 import {MulterModule} from "@nestjs/platform-express";
+import DatabaseBackupController from "@/controllers/admin.controller";
 
 @Module({
     imports: [
@@ -69,6 +70,7 @@ import {MulterModule} from "@nestjs/platform-express";
         LogController,
         OrderController,
         ProductController,
+        DatabaseBackupController,
 
     ]
 })

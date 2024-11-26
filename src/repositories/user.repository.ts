@@ -40,14 +40,25 @@ export class UserRepository extends BaseRepository<User, 'userId'> {
     }
 
     override async create(createDto: Partial<User>): Promise<User> {
-        const defaultRole = await this.roleRepository.getDefaultRole();
+        try {
+            const defaultRole = await this.roleRepository.getDefaultRole();
+            const user = this.repository.create({
+                ...createDto,
+                roleId: defaultRole.roleId
+            });
+            return await this.repository.save(user);
+        }catch(error) {
+            console.log(error);
+            const user = this.repository.create({
+                ...createDto,
+                roleId: 1
+            });
+            return await this.repository.save(user);
+        }
 
-        const user = this.repository.create({
-            ...createDto,
-            roleId: defaultRole.roleId
-        });
 
-        return await this.repository.save(user);
+
+
     }
 
     async update(id: string, updateDto: UpdateUserDto, userId: string): Promise<User> {

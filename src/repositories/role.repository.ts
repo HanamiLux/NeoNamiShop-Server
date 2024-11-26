@@ -12,16 +12,16 @@ export class RoleRepository extends BaseRepository<Role, 'roleId'> {
         super(repository, logService, 'roleId');
     }
 
-    async getDefaultRole(): Promise<Role> {
-        const defaultRole = await this.repository.findOne({
-            where: { roleName: 'user' } as FindOptionsWhere<Role>
-        });
+    public async getDefaultRole(): Promise<Role> {
+            const defaultRole = await this.repository.findOne({
+                where: {roleName: 'user'} as FindOptionsWhere<Role>
+            });
 
-        if (!defaultRole) {
-            throw new Error('Default role not found');
-        }
+            if (!defaultRole) {
+                throw new Error('Default role not found');
+            }
 
-        return defaultRole;
+            return defaultRole;
     }
 
     override async remove(id: number, userId: string): Promise<void> {
