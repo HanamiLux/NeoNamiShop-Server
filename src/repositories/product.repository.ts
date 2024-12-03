@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Product } from '@entities/Product.entity';
 import { BaseRepository } from '@/repositories/base.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import {DeepPartial, Repository} from 'typeorm';
+import {Repository} from 'typeorm';
 import { LogService } from '@services/Log.service';
 import {PaginationQueryDto} from "@/dtos/common.dto";
-import * as process from "node:process";
 
 @Injectable()
 export class ProductRepository extends BaseRepository<Product, 'productId'> {
