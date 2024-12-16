@@ -1,25 +1,29 @@
-import { IsString, IsNotEmpty, IsNumber, Min, Max } from 'class-validator';
+import {
+  IsString, IsNotEmpty, IsNumber, Min, Max,
+} from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
 export class CreateFeedbackDto {
     @IsNumber()
     @Min(1)
     @Max(5)
-    rate: number;
+      rate: number;
 
     @IsString()
     @IsNotEmpty()
-    content: string;
+      content: string;
 
     @IsNumber()
     @IsNotEmpty()
-    productId: number;
+      productId: number;
 }
 
 export class UpdateFeedbackDto extends PartialType(CreateFeedbackDto) {}
 
 export class FeedbackDto extends CreateFeedbackDto {
-    feedbackId: number;
-    date: Date;
-    userId: string;
+  feedbackId: number;
+
+  date: Date;
+
+  userId: string;
 }

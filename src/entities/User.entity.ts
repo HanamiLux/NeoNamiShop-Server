@@ -1,58 +1,58 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToMany,
-    ManyToOne,
-    BeforeInsert,
-    BeforeUpdate,
-    JoinColumn
-} from "typeorm"
-import { Order } from "./Order.entity"
-import { Feedback } from "./Feedback.entity"
-import { Log } from "./Log.entity"
-import {Role} from "@entities/Role.entity";
-import {PasswordUtils} from "@/utils/password.utils";
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  BeforeInsert,
+  BeforeUpdate,
+  JoinColumn,
+} from 'typeorm';
+import { Role } from '@entities/Role.entity';
+import { Order } from './Order.entity';
+import { Feedback } from './Feedback.entity';
+import { Log } from './Log.entity';
+import { PasswordUtils } from '@/utils/password.utils';
 
-@Entity("users")
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn('uuid')
-    userId: string;
+      userId: string;
 
     @Column({ length: 40, unique: true })
-    login: string
+      login: string;
 
     @Column({ length: 255, unique: true })
-    email: string
+      email: string;
 
     @Column({ length: 255, select: false })
-    password: string
+      password: string;
 
     @Column()
-    roleId: number
+      roleId: number;
 
-    @ManyToOne(() => Role, role => role.users)
+    @ManyToOne(() => Role, (role) => role.users)
     @JoinColumn({ name: 'roleId' })
-    role: Role
+      role: Role;
 
-    @OneToMany(() => Order, order => order.user)
-    orders: Order[]
+    @OneToMany(() => Order, (order) => order.user)
+      orders: Order[];
 
-    @OneToMany(() => Feedback, feedback => feedback.user)
-    feedbacks: Feedback[]
+    @OneToMany(() => Feedback, (feedback) => feedback.user)
+      feedbacks: Feedback[];
 
-    @OneToMany(() => Log, log => log.user)
-    logs: Log[]
+    @OneToMany(() => Log, (log) => log.user)
+      logs: Log[];
 
     @BeforeInsert()
     @BeforeUpdate()
     async hashPassword() {
-        if (this.password) {
-            this.password = await PasswordUtils.hash(this.password);
-        }
+      if (this.password) {
+        this.password = await PasswordUtils.hash(this.password);
+      }
     }
 
     getRoleName(): string | undefined {
-        return this.role.roleName;
+      return this.role.roleName;
     }
 }

@@ -1,7 +1,6 @@
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
-
 export interface ILogDto {
     userId: string;
     content: string;
@@ -17,25 +16,27 @@ enum LogType {
 export class CreateLogDto {
     @IsEnum(LogType)
     @IsNotEmpty()
-    type: LogType;
+      type: LogType;
 
     @IsString()
     @IsNotEmpty()
-    description: string;
+      description: string;
 
     @IsString()
     @IsNotEmpty()
-    entityName: string;
+      entityName: string;
 
     @IsString()
     @IsNotEmpty()
-    entityId: string;
+      entityId: string;
 }
 
 export class UpdateLogDto extends PartialType(CreateLogDto) {}
 
 export class LogDto extends CreateLogDto {
-    logId: number;
-    date: Date;
-    userId: string;
+  logId: number;
+
+  date: Date;
+
+  userId: string;
 }

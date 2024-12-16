@@ -1,4 +1,4 @@
-//TODO import { getConnection } from "typeorm";
+// TODO import { getConnection } from "typeorm";
 //
 // async function addProductFeedback(productId: number, rate: number, content: string) {
 //     await getConnection().query(

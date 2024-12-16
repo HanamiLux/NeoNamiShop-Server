@@ -1,7 +1,7 @@
-import { ViewEntity, ViewColumn } from "typeorm";
+import { ViewEntity, ViewColumn } from 'typeorm';
 
 @ViewEntity({
-    expression: `
+  expression: `
         SELECT
             p."productName",
             COUNT(f."feedbackId") AS total_feedbacks,
@@ -11,15 +11,18 @@ import { ViewEntity, ViewColumn } from "typeorm";
         LEFT JOIN product_feedbacks pf ON p."productId" = pf."productProductId"
         LEFT JOIN feedbacks f ON pf."feedbackFeedbackId" = f."feedbackId"
         GROUP BY p."productName"
-    `
+    `,
 })
 export class ProductFeedbackStatistics {
     @ViewColumn()
-    productName: string;
+      productName: string;
+
     @ViewColumn()
-    totalFeedbacks: number;
+      totalFeedbacks: number;
+
     @ViewColumn()
-    averageRating: number;
+      averageRating: number;
+
     @ViewColumn()
-    recentFeedbacks: string;
+      recentFeedbacks: string;
 }

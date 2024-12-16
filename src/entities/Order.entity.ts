@@ -1,27 +1,29 @@
-import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {User} from "@entities/User.entity";
-import {OrderedProduct} from "@entities/OrderedProduct.entity";
+import {
+  Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '@entities/User.entity';
+import { OrderedProduct } from '@entities/OrderedProduct.entity';
 
-@Entity("orders")
+@Entity('orders')
 export class Order {
     @PrimaryGeneratedColumn()
-    orderId: number
+      orderId: number;
 
     @Column()
-    userId: string
+      userId: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    date: Date
+      date: Date;
 
     @Column({ length: 50 })
-    status: string
+      status: string;
 
     @Column()
-    total: number
+      total: number;
 
-    @ManyToOne(() => User, user => user.orders)
-    user: User
+    @ManyToOne(() => User, (user) => user.orders)
+      user: User;
 
-    @OneToMany(() => OrderedProduct, orderedProduct => orderedProduct.order)
-    orderedProducts: OrderedProduct[]
+    @OneToMany(() => OrderedProduct, (orderedProduct) => orderedProduct.order)
+      orderedProducts: OrderedProduct[];
 }

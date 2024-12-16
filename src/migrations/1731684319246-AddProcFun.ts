@@ -1,9 +1,9 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddProcFun1731684319246 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        // Создание функции
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Создание функции
+    await queryRunner.query(`
             CREATE OR REPLACE FUNCTION get_product_full_statistics(product_id INT)
             RETURNS TABLE (
                 product_name VARCHAR,
@@ -33,8 +33,8 @@ export class AddProcFun1731684319246 implements MigrationInterface {
             $$ LANGUAGE plpgsql;
         `);
 
-        // Создание процедуры
-        await queryRunner.query(`
+    // Создание процедуры
+    await queryRunner.query(`
             CREATE OR REPLACE PROCEDURE add_feedback(
                 product_id INT,
                 rate DECIMAL,
@@ -58,13 +58,13 @@ export class AddProcFun1731684319246 implements MigrationInterface {
             END;
             $$;
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        // Удаление функции
-        await queryRunner.query(`DROP FUNCTION IF EXISTS get_product_full_statistics(INT);`);
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Удаление функции
+    await queryRunner.query('DROP FUNCTION IF EXISTS get_product_full_statistics(INT);');
 
-        // Удаление процедуры
-        await queryRunner.query(`DROP PROCEDURE IF EXISTS add_feedback(INT, DECIMAL, TEXT);`);
-    }
+    // Удаление процедуры
+    await queryRunner.query('DROP PROCEDURE IF EXISTS add_feedback(INT, DECIMAL, TEXT);');
+  }
 }

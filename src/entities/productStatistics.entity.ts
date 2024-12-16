@@ -1,7 +1,7 @@
 import { ViewEntity, ViewColumn } from 'typeorm';
 
 @ViewEntity({
-    expression: `
+  expression: `
         SELECT
             c."categoryName",
             COUNT(p."productId") AS total_products,
@@ -10,15 +10,18 @@ import { ViewEntity, ViewColumn } from 'typeorm';
         FROM products p
         JOIN category c ON p."categoryId" = c."categoryId"
         GROUP BY c."categoryName"
-    `
+    `,
 })
 export class ProductStatistics {
     @ViewColumn()
-    categoryName: string;
+      categoryName: string;
+
     @ViewColumn()
-    totalProducts: number;
+      totalProducts: number;
+
     @ViewColumn()
-    averagePrice: number;
+      averagePrice: number;
+
     @ViewColumn()
-    totalStock: number;
+      totalStock: number;
 }

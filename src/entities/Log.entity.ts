@@ -1,23 +1,25 @@
-import {User} from "@entities/User.entity";
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import { User } from '@entities/User.entity';
+import {
+  Column, Entity, ManyToOne, PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity("logs")
+@Entity('logs')
 export class Log {
     @PrimaryGeneratedColumn()
-    logId: number
+      logId: number;
 
     @Column()
-    userId: string
+      userId: string;
 
-    @Column("text")
-    content: string
+    @Column('text')
+      content: string;
 
     @Column({ length: 20 })
-    type: string;
+      type: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    date: Date
+      date: Date;
 
-    @ManyToOne(() => User, user => user.logs)
-    user: User
+    @ManyToOne(() => User, (user) => user.logs)
+      user: User;
 }

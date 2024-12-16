@@ -1,28 +1,30 @@
-import {Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {User} from "@entities/User.entity";
-import {Product} from "@entities/Product.entity";
+import {
+  Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '@entities/User.entity';
+import { Product } from '@entities/Product.entity';
 
-@Entity("feedbacks")
+@Entity('feedbacks')
 export class Feedback {
     @PrimaryGeneratedColumn()
-    feedbackId: number;
+      feedbackId: number;
 
     @Column()
-    userId: string;
+      userId: string;
 
     @Column()
-    rate: number;
+      rate: number;
 
-    @Column("text")
-    content: string;
+    @Column('text')
+      content: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    date: Date;
+      date: Date;
 
-    @ManyToOne(() => User, user => user.feedbacks)
-    user: User;
+    @ManyToOne(() => User, (user) => user.feedbacks)
+      user: User;
 
-    @ManyToMany(() => Product, product => product.feedbacks, {cascade: true})
+    @ManyToMany(() => Product, (product) => product.feedbacks, { cascade: true })
     @JoinTable()
-    products: Product[];
+      products: Product[];
 }
