@@ -10,6 +10,14 @@ import { BaseRepository } from '@/repositories/base.repository';
 import { CreateOrderDto } from '@/dtos/order.dto';
 import { PaginationQueryDto } from '@/dtos/common.dto';
 
+export enum OrderStatus {
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  SHIPPED = 'shipped',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
 @Injectable()
 export class OrderRepository extends BaseRepository<Order, 'orderId'> {
   constructor(
@@ -68,7 +76,7 @@ export class OrderRepository extends BaseRepository<Order, 'orderId'> {
       // Создаем заказ
       const order = this.repository.create({
         userId,
-        status: 'pending',
+        status: OrderStatus.PENDING,
         total: createOrderDto.total,
       });
 

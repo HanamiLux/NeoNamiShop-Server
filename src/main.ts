@@ -5,22 +5,23 @@ import { DataSource } from 'typeorm';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
+import { PrometheusService } from '@/metrics/prometheus.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const dataSource = app.get(DataSource);
+  const prometheusService = app.get(PrometheusService);
+
   console.log('База данных подключена:', dataSource.isInitialized);
   console.log('Список сущностей:', dataSource.entityMetadatas.map((entity) => entity.name));
 
   // Настраиваем раздачу статических файлов
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  });
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads/' });
 
   app.useGlobalPipes(new ValidationPipe({
-    transform: true, // Преобразует входные данные в соответствующие типы
-    whitelist: true, // Удаляет невалидные поля
-    forbidNonWhitelisted: true, // Запрещает невалидные поля
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
     exceptionFactory: (errors) => {
       const messages = errors.map((error) => ({
         field: error.property,
@@ -35,23 +36,36 @@ async function bootstrap() {
   }));
 
   app.enableCors();
-
   app.setGlobalPrefix('api/v1');
 
-  // Swagger configuration
+  // Middleware для отслеживания метрик запросов
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      const duration = (Date.now() - start) / 1000;
+      prometheusService.trackRequest();
+      prometheusService.recordResponseTime(duration);
+    });
+    next();
+  });
+
+  // Запускаем обновление метрики активных заказов каждые 30 секунд
+  setInterval(async () => {
+    await prometheusService.updateActiveOrders();
+  }, 30000);
+
+  // Swagger
   const config = new DocumentBuilder()
-    .setTitle('NEONAMI-API')
-    .setDescription('Api documentation')
-    .setVersion('1.0')
-  // Add JWT bearer auth if you're using authentication
-  // .addBearerAuth()
-  // Add tags for API grouping if needed
-    .addTag('products')
-    .build();
+      .setTitle('NEONAMI-API')
+      .setDescription('Api documentation')
+      .setVersion('1.0')
+      .addTag('products')
+      .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(3003);
 }
+
 bootstrap();

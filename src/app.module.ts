@@ -12,7 +12,7 @@ import { Log } from '@entities/Log.entity';
 import { Product } from '@entities/Product.entity';
 import { Order } from '@entities/Order.entity';
 import { OrderedProduct } from '@entities/OrderedProduct.entity';
-import {config} from '@/config/ormconfig';
+import { config } from '@/config/ormconfig';
 import { AppController } from '@/controllers/app.controller';
 import { LogService } from '@services/Log.service';
 import { OrderedProductRepository } from '@/repositories/orderedProduct.repository';
@@ -34,6 +34,7 @@ import { ProductFeedbackStatistics } from '@entities/productFeedbackStatistics.e
 import { ProductStatistics } from '@entities/productStatistics.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import DatabaseBackupController from '@/controllers/admin.controller';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -47,8 +48,10 @@ import DatabaseBackupController from '@/controllers/admin.controller';
       dest: './uploads',
     }),
     ScheduleModule.forRoot(),
+    MetricsModule,  // Добавляем модуль метрик
   ],
-  providers: [AppService,
+  providers: [
+    AppService,
     BackupService,
     LogService,
     OrderedProductRepository,
@@ -58,11 +61,11 @@ import DatabaseBackupController from '@/controllers/admin.controller';
     FeedbackRepository,
     RoleRepository,
     UserRepository,
-        Repository<ProductFeedbackStatistics>,
-        Repository<ProductStatistics>,
-
+    Repository<ProductFeedbackStatistics>,
+    Repository<ProductStatistics>,
   ],
-  controllers: [AppController,
+  controllers: [
+    AppController,
     RoleController,
     UserController,
     CategoryController,
@@ -71,8 +74,6 @@ import DatabaseBackupController from '@/controllers/admin.controller';
     OrderController,
     ProductController,
     DatabaseBackupController,
-
   ],
 })
-export class AppModule {
-}
+export class AppModule {}
