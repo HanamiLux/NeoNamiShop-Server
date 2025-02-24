@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import {Counter, Gauge, Histogram, register, Registry} from 'prom-client';
+import {Counter, Gauge, register, Summary} from 'prom-client';
 import {OrderRepository, OrderStatus} from "@/repositories/order.repository";
 
 @Injectable()
@@ -8,7 +8,7 @@ export class PrometheusService {
     constructor(
         @InjectMetric('http_requests_total') private httpRequestsTotal: Counter,
         @InjectMetric('active_orders') private activeOrders: Gauge,
-        @InjectMetric('response_time_seconds') private responseTime: Histogram,
+        @InjectMetric('response_time_seconds') private responseTime: Summary,
         private orderRepository: OrderRepository,
     ) {}
 

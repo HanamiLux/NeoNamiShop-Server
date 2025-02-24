@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import {
     makeCounterProvider,
     makeGaugeProvider,
-    makeHistogramProvider,
+    makeHistogramProvider, makeSummaryProvider,
     PrometheusModule
 } from "@willsoto/nestjs-prometheus";
 import {PrometheusService} from "@/metrics/prometheus.service";
@@ -23,7 +23,7 @@ import {MetricsController} from "@/metrics/metrics.controller";
         LogService,
         makeCounterProvider({ name: 'http_requests_total', help: 'Total number of HTTP requests' }),
         makeGaugeProvider({ name: 'active_orders', help: 'Number of active orders' }),
-        makeHistogramProvider({ name: 'response_time_seconds', help: 'Response time in seconds' }),
+        makeSummaryProvider({ name: 'response_time_seconds', help: 'Response time in seconds', percentiles: [0.5, 0.9, 0.99] }),
         PrometheusService
     ],
     controllers: [
