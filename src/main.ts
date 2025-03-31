@@ -43,7 +43,9 @@ async function bootstrap() {
     const start = Date.now();
     res.on('finish', () => {
       const duration = (Date.now() - start) / 1000;
-      prometheusService.trackRequest();
+      const route = req.route?.path || req.url
+      const status = res.statusCode;
+      prometheusService.trackRequest(route, status);
       prometheusService.recordResponseTime(duration);
     });
     next();

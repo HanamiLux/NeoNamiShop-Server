@@ -117,17 +117,22 @@ export class ProductController {
       await this.productRepository.remove(id, userId);
     }
 
-    @ApiOperation({ summary: 'Get product feedbacks statistics' })
-    @ApiResponse({ status: 200, type: [ProductFeedbackStatistics] })
-    @Get('feedbackStats')
-    async getProductFeedbackStats(): Promise<ProductFeedbackStatistics[]> {
-      return this.productFeedbackRepository.find();
-    }
+  @ApiOperation({ summary: 'Get feedback statistics for a specific product' })
+  @ApiResponse({ status: 200, type: ProductFeedbackStatistics })
+  @Get('feedbackStats/:productId')
+  async getProductFeedbackStats(
+      @Param('productId', ParseIntPipe) productId: number
+  ): Promise<ProductFeedbackStatistics> {
+    return this.productFeedbackRepository.findOne({
+      where: { productId }
+    });
+  }
 
-    @ApiOperation({ summary: 'Get product statistics' })
-    @ApiResponse({ status: 200, type: [ProductStatistics] })
-    @Get('stats')
-    async getProductStatistics(): Promise<ProductStatistics[]> {
-      return this.productStatisticsRepository.find();
-    }
+  @Get('stats')
+  async getProductStatistics(
+      @Query('categoryId', new ParseIntPipe({ optional: true })) categoryId?: number
+  ): Promise<ProductStatistics[]> {
+    const where = categoryId ? { categoryId } : {};
+    return this.productStatisticsRepository.find({ where });
+  }
 }
