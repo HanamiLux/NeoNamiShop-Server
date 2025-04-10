@@ -11,11 +11,9 @@ export class RemoveProductFeedbackStatisticsView1732476340369 implements Migrati
     );
     // Удалить представление, если оно существует
     await queryRunner.query('DROP VIEW IF EXISTS "product_feedback_statistics"');
-    await queryRunner.query('DROP TABLE "product_feedbacks"');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('CREATE TABLE "product_feedbacks" ("id" SERIAL NOT NULL, "productProductId" integer, "feedbackFeedbackId" integer, CONSTRAINT "PK_137209d7e486adfc8b85688b4c5" PRIMARY KEY ("id"))');
     // Восстановить представление
     await queryRunner.query(`CREATE VIEW "product_feedback_statistics" AS 
         SELECT

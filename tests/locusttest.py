@@ -1,13 +1,11 @@
-from locust import HttpUser, task, between
+from locust import HttpUser, task, between, TaskSet
 from faker import Faker
 import random
 
 fake = Faker()
 VALID_CATEGORIES = [2, 6, 7, 8]
 
-class ProductUser(HttpUser):
-    wait_time = between(1, 5)
-
+class ProductTasks(TaskSet):
     def on_start(self):
         self.headers = {"Content-Type": "application/json"}
         self.login()
@@ -60,12 +58,10 @@ class ProductUser(HttpUser):
 
     @task(5)
     def browse_products(self):
-        # Просмотр списка товаров
         with self.client.get("/api/v1/products", catch_response=True) as list_response:
             if list_response.status_code == 200:
                 products = list_response.json().get('items', [])
                 if products:
-                    # Просмотр случайного товара
                     product = random.choice(products)
                     self.client.get(
                         f"/api/v1/products/{product['productId']}",
@@ -111,11 +107,14 @@ class ProductUser(HttpUser):
 
     @task(4)
     def view_statistics(self):
-       # Для статистики по конкретному товару
-       if self.created_products:
-           product_id = random.choice(self.created_products)
-           self.client.get(
-               "/api/v1/products/feedbackStats/18",
-               headers=self.headers,
-               name="/feedbackStats/:id"
-           )
+        if self.created_products:
+            product_id = random.choice(self.created_products)
+            self.client.get(
+                "/api/v1/products/feedbackStats/18",
+                headers=self.headers,
+                name="/feedbackStats/:id"
+            )
+
+class ProductUser(HttpUser):
+    wait_time = between(1, 5)
+    tasks = [ProductTasks]
