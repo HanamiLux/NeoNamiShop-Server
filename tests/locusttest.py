@@ -116,5 +116,5 @@ class ProductTasks(TaskSet):
             )
 
 class ProductUser(HttpUser):
-    wait_time = between(1, 5)
+    wait_time = 4
     tasks = [ProductTasks]
