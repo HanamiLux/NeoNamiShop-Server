@@ -15,6 +15,9 @@ export class Feedback {
     @Column()
       rate: number;
 
+    @Column()
+    productId: number;
+
     @Column('text')
       content: string;
 

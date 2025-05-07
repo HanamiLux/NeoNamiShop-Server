@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {Injectable, Param, ParseUUIDPipe, UnauthorizedException} from '@nestjs/common';
 import { User } from '@entities/User.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -33,6 +33,13 @@ export class UserRepository extends BaseRepository<User, 'userId'> {
   async findByEmail(email: string): Promise<User | null> {
     return await this.repository.findOne({
       where: { email },
+      select: ['userId', 'login', 'email', 'password', 'roleId'],
+    });
+  }
+
+  async findById(@Param('userId', ParseUUIDPipe) userId: string,): Promise<User | null> {
+    return await this.repository.findOne({
+      where: { userId },
       select: ['userId', 'login', 'email', 'password', 'roleId'],
     });
   }

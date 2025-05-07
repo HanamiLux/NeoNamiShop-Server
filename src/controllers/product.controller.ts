@@ -47,7 +47,15 @@ export class ProductController {
   async getProducts(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: ProductDto[], total: number } | { message: string }> {
     const { items, total } = await this.productRepository.findAll(paginationQuery);
     const productDtos = items.map(toProductDto);
-    return { items: productDtos, total };
+      const productsWithStats = await Promise.all(
+          productDtos.map(async (product) => ({
+            ...product,
+            ...(await this.productFeedbackRepository.findOne({
+              where: { productId: product.productId }
+            }))
+          }))
+      );
+    return { items: productsWithStats, total };
   }
 
     @ApiOperation({ summary: 'Get a product' })
@@ -60,7 +68,16 @@ export class ProductController {
       if (!product) {
         throw new Error(`Product with ID ${id} not found`);
       }
-      return toProductDto(product);
+      const productDto = toProductDto(product);
+      const feedbackStats = await this.productFeedbackRepository.findOne({
+        where: { productId: id }
+      });
+
+      return {
+        ...productDto,
+        averageRating: feedbackStats?.averageRating || 0,
+        totalFeedbacks: feedbackStats?.totalFeedbacks || 0
+      };
     }
 
     @ApiOperation({ summary: 'Create a product' })
@@ -128,11 +145,11 @@ export class ProductController {
     });
   }
 
-  @Get('stats')
-  async getProductStatistics(
-      @Query('categoryId', new ParseIntPipe({ optional: true })) categoryId?: number
-  ): Promise<ProductStatistics[]> {
-    const where = categoryId ? { categoryId } : {};
-    return this.productStatisticsRepository.find({ where });
-  }
+  // @Get('stats')
+  // async getProductStatistics(
+  //     @Query('categoryId', new ParseIntPipe({ optional: true })) categoryId?: number
+  // ): Promise<ProductStatistics[]> {
+  //   const where = categoryId ? { categoryId } : {};
+  //   return this.productStatisticsRepository.find({ where });
+  // }
 }

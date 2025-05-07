@@ -1,5 +1,5 @@
 import {
-  IsString, IsNotEmpty, IsNumber, Min, Max,
+    IsString, IsNotEmpty, IsNumber, Min, Max, MaxLength,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
@@ -11,6 +11,7 @@ export class CreateFeedbackDto {
 
     @IsString()
     @IsNotEmpty()
+    @MaxLength(1000)
       content: string;
 
     @IsNumber()

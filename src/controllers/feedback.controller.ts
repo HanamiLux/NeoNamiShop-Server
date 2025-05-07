@@ -1,17 +1,17 @@
 import {
-  Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query,
+  Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, ParseUUIDPipe, Post, Put, Query,
 } from '@nestjs/common';
 import { Feedback } from '@entities/Feedback.entity';
 import { FeedbackRepository } from '@/repositories/feedback.repository';
 import { PaginationQueryDto } from '@/dtos/common.dto';
-import { CreateFeedbackDto, UpdateFeedbackDto } from '@/dtos/feedback.dto';
+import {CreateFeedbackDto, FeedbackDto, UpdateFeedbackDto} from '@/dtos/feedback.dto';
 
 @Controller('feedbacks')
 export class FeedbackController {
   constructor(private readonly feedbackRepository: FeedbackRepository) {}
 
     @Get()
-  async getFeedbacks(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: Feedback[], total: number }> {
+  async getFeedbacks(@Query() paginationQuery: PaginationQueryDto): Promise<{ items: FeedbackDto[], total: number }> {
     return await this.feedbackRepository.findAll(paginationQuery);
   }
 
@@ -28,7 +28,7 @@ export class FeedbackController {
     async getFeedbacksByProduct(
         @Param('productId', ParseIntPipe) productId: number,
         @Query() paginationQuery: PaginationQueryDto,
-    ): Promise<{ items: Feedback[], total: number }> {
+    ): Promise<{ items: FeedbackDto[], total: number }> {
       return await this.feedbackRepository.findByProduct(productId, paginationQuery);
     }
 
@@ -40,13 +40,24 @@ export class FeedbackController {
       return await this.feedbackRepository.findByUser(userId, paginationQuery);
     }
 
-    @Post()
-    async createFeedback(
-        @Body() createFeedbackDto: CreateFeedbackDto,
-        @Query('userId', ParseUUIDPipe) userId: string,
-    ): Promise<Feedback> {
-      return await this.feedbackRepository.create(createFeedbackDto, userId);
+  @Post()
+  async createFeedback(
+      @Body() createFeedbackDto: CreateFeedbackDto,
+      @Query('userId', ParseUUIDPipe) userId: string,
+  ): Promise<Feedback> {
+    try {
+      return await this.feedbackRepository.create({
+        ...createFeedbackDto,
+        userId: userId
+      }, userId);
+    } catch (error) {
+      console.error('Error creating feedback:', error);
+      throw new HttpException(
+          'Failed to create feedback: ' + error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
+  }
 
     @Put(':id')
     async updateFeedback(
