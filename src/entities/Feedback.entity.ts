@@ -1,5 +1,5 @@
 import {
-  Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn,
+    Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '@entities/User.entity';
 import { Product } from '@entities/Product.entity';
@@ -24,7 +24,7 @@ export class Feedback {
     @ManyToOne(() => User, (user) => user.feedbacks)
       user: User;
 
-    @ManyToMany(() => Product, (product) => product.feedbacks, { cascade: true })
-    @JoinTable()
-      products: Product[];
+    @ManyToOne(() => Product, (product) => product.feedbacks)
+    @JoinColumn({ name: 'productId' })
+      products: Product;
 }

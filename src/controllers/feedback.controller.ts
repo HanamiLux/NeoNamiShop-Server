@@ -16,7 +16,7 @@ export class FeedbackController {
   }
 
     @Get(':id')
-    async getFeedback(@Param('id', ParseUUIDPipe) id: number): Promise<Feedback> {
+    async getFeedback(@Param('id', ParseIntPipe) id: number): Promise<Feedback> {
       const feedback = await this.feedbackRepository.findOneById(id);
       if (!feedback) {
         throw new Error(`Feedback with ID ${id} not found`);
@@ -50,7 +50,7 @@ export class FeedbackController {
 
     @Put(':id')
     async updateFeedback(
-        @Param('id', ParseUUIDPipe) id: number,
+        @Param('id', ParseIntPipe) id: number,
         @Body() updateFeedbackDto: UpdateFeedbackDto,
         @Query('userId', ParseUUIDPipe) userId: string,
     ): Promise<Feedback> {
@@ -59,7 +59,7 @@ export class FeedbackController {
 
     @Delete(':id')
     async deleteFeedback(
-        @Param('id', ParseUUIDPipe) id: number,
+        @Param('id', ParseIntPipe) id: number,
         @Query('userId', ParseUUIDPipe) userId: string,
     ): Promise<void> {
       await this.feedbackRepository.remove(id, userId);

@@ -10,10 +10,9 @@ import { ViewEntity, ViewColumn } from 'typeorm';
         AVG(f.rate) AS "averageRating",
         STRING_AGG(f.content, ' | ' ORDER BY f.date DESC) AS "recentFeedbacks"
     FROM products p
-    LEFT JOIN product_feedbacks pf ON p."productId" = pf."productProductId"
-    LEFT JOIN feedbacks f ON pf."feedbackFeedbackId" = f."feedbackId"
+    LEFT JOIN feedbacks f ON p."productId" = f."productId"
     GROUP BY p."productId", p."productName"
-  `,
+    `
 })
 export class ProductFeedbackStatistics {
     @ViewColumn()

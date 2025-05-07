@@ -14,7 +14,6 @@ export class FeedbackRepository extends BaseRepository<Feedback, 'feedbackId'> {
 
   async findByProduct(productId: number, paginationQuery: PaginationQueryDto): Promise<{ items: Feedback[], total: number }> {
     const query = this.repository.createQueryBuilder('feedback')
-      .leftJoinAndSelect('feedback.products', 'product')
       .where('product.productId = :productId', { productId })
       .skip(paginationQuery.skip)
       .take(paginationQuery.take);
