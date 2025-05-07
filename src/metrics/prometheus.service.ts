@@ -19,21 +19,21 @@ export class PrometheusService {
         this.httpRequestsTotal.inc(); // Увеличиваем количество запросов
 
         //influxdb:
-        const point = new Point('http_requests')
-            .tag('route', route)
-            .tag('env', process.env.NODE_ENV)
-            .tag('status', String(status))
-            .intField('count', 1);
-        this.influxDBService.writeMetric(point);
+        // const point = new Point('http_requests')
+        //     .tag('route', route)
+        //     .tag('env', process.env.NODE_ENV)
+        //     .tag('status', String(status))
+        //     .intField('count', 1);
+        // this.influxDBService.writeMetric(point);
     }
 
     recordResponseTime(time: number) {
         this.responseTime.observe(time); // Фиксируем время ответа
 
         //influxdb:
-        const point = new Point('response_times')
-            .floatField('duration', time);
-        this.influxDBService.writeMetric(point);
+        // const point = new Point('response_times')
+        //     .floatField('duration', time);
+        // this.influxDBService.writeMetric(point);
     }
 
     async updateActiveOrders() {
@@ -43,10 +43,10 @@ export class PrometheusService {
 
 
         //influxdb:
-        const point = new Point('orders')
-            .tag('status', OrderStatus.PROCESSING)
-            .intField('count', activeOrdersCount);
-        this.influxDBService.writeMetric(point);
+        // const point = new Point('orders')
+        //     .tag('status', OrderStatus.PROCESSING)
+        //     .intField('count', activeOrdersCount);
+        // this.influxDBService.writeMetric(point);
     }
 
     async getMetrics(): Promise<string> {

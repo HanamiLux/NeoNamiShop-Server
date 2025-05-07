@@ -87,11 +87,18 @@ export class OrderRepository extends BaseRepository<Order, 'orderId'> {
         createOrderDto.products.map(async (productData) => {
           const product = await queryRunner.manager.findOne(Product, {
             where: { productId: productData.productId },
+            lock: { mode: "pessimistic_write" }
           });
 
           if (!product) {
             throw new Error(`Product with ID ${productData.productId} not found`);
           }
+
+          if (product.quantity < productData.quantity && productData.quantity != 0) {
+            throw new Error(`Not enough stock for product ${product.productId}`);
+          }
+          product.quantity -= productData.quantity;
+          await queryRunner.manager.save(product);
 
           const orderedProduct = new OrderedProduct();
           orderedProduct.order = order;
