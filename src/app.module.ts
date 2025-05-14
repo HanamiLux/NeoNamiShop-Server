@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { BackupService } from '@services/Backup.service';
+import {BackupService} from "@services/Backup.service";
 import { AppService } from '@services/app.service';
 import { Role } from '@entities/Role.entity';
 import { Category } from '@entities/Category.entity';
@@ -12,7 +12,6 @@ import { Log } from '@entities/Log.entity';
 import { Product } from '@entities/Product.entity';
 import { Order } from '@entities/Order.entity';
 import { OrderedProduct } from '@entities/OrderedProduct.entity';
-import { config } from '@/config/ormconfig';
 import { AppController } from '@/controllers/app.controller';
 import { LogService } from '@services/Log.service';
 import { OrderedProductRepository } from '@/repositories/orderedProduct.repository';
@@ -35,6 +34,8 @@ import { ProductStatistics } from '@entities/productStatistics.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import DatabaseBackupController from '@/controllers/admin.controller';
 import { MetricsModule } from './metrics/metrics.module';
+import {join} from "path";
+
 
 @Module({
   imports: [
@@ -42,13 +43,28 @@ import { MetricsModule } from './metrics/metrics.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    TypeOrmModule.forRootAsync(config),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: +configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
+        entities: [__dirname + '/../**/*.entity{.js,.ts}'],
+        migrations: [join(__dirname, '../migrations/*{.js,.ts}')],
+        synchronize: configService.get('NODE_ENV') !== 'production',
+        logging: configService.get('NODE_ENV') === 'development',
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forFeature([Role, Category, Feedback, User, Log, Product, Order, OrderedProduct, ProductFeedbackStatistics, ProductStatistics]),
     MulterModule.register({
       dest: './uploads',
     }),
     ScheduleModule.forRoot(),
-    MetricsModule,  // Добавляем модуль метрик
+    MetricsModule,
   ],
   providers: [
     AppService,

@@ -9,9 +9,9 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Role } from '@entities/Role.entity';
-import { Order } from './Order.entity';
-import { Feedback } from './Feedback.entity';
-import { Log } from './Log.entity';
+import { Order } from '@entities//Order.entity';
+import { Feedback } from '@entities//Feedback.entity';
+import { Log } from '@entities//Log.entity';
 import { PasswordUtils } from '@/utils/password.utils';
 
 @Entity('users')

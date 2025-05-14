@@ -56,7 +56,7 @@ export class UserRepository extends BaseRepository<User, 'userId'> {
       console.log(error);
       const user = this.repository.create({
         ...createDto,
-        roleId: 1,
+        roleId: 3,
       });
       return await this.repository.save(user);
     }

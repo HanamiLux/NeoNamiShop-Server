@@ -1,19 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { DataSource } from 'typeorm';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { PrometheusService } from '@/metrics/prometheus.service';
+import dataSource from "./config/dataSource";
+import 'module-alias/register';
+import {DataSource} from "typeorm";
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const dataSource = app.get(DataSource);
-  const prometheusService = app.get(PrometheusService);
 
-  console.log('База данных подключена:', dataSource.isInitialized);
-  console.log('Список сущностей:', dataSource.entityMetadatas.map((entity) => entity.name));
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const prometheusService = app.get(PrometheusService);
+  const connection = app.get(DataSource);
+  console.log('Список сущностей:', connection.entityMetadatas.map((entity) => entity.name));
 
   // Настраиваем раздачу статических файлов
   app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads/' });

@@ -25,9 +25,10 @@ export class Feedback {
       date: Date;
 
     @ManyToOne(() => User, (user) => user.feedbacks)
-      user: User;
+    @JoinColumn({ name: 'userId' })
+    user: User;
 
     @ManyToOne(() => Product, (product) => product.feedbacks)
     @JoinColumn({ name: 'productId' })
-      products: Product;
+      product: Product;
 }

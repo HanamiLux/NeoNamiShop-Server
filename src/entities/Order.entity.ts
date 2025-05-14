@@ -1,5 +1,5 @@
 import {
-  Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn,
+    Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '@entities/User.entity';
 import { OrderedProduct } from '@entities/OrderedProduct.entity';
@@ -22,6 +22,7 @@ export class Order {
       total: number;
 
     @ManyToOne(() => User, (user) => user.orders)
+    @JoinColumn({ name: 'userId' })
       user: User;
 
     @OneToMany(() => OrderedProduct, (orderedProduct) => orderedProduct.order)

@@ -41,7 +41,6 @@ export class Product {
     @OneToMany(() => OrderedProduct, (orderedProduct) => orderedProduct.product)
       orderedProducts: OrderedProduct[];
 
-    @ManyToMany(() => Feedback, (feedback) => feedback.products)
-    @JoinTable()
-      feedbacks: Feedback[];
+    @OneToMany(() => Feedback, (feedback) => feedback.product)
+    feedbacks: Feedback[];
 }
